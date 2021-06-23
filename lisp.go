@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"lisp/lisp"
 	"os"
 )
 
@@ -19,6 +20,13 @@ func main() {
 		}
 
 		input := scanner.Text()
-		fmt.Println(input)
+		tokens, err := lisp.Tokenize(input)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		for _, token := range tokens {
+			fmt.Printf("%v: %v\n", token.Type, token.Value)
+		}
 	}
 }
