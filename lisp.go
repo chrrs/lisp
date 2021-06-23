@@ -23,10 +23,15 @@ func main() {
 		tokens, err := lisp.Tokenize(input)
 		if err != nil {
 			fmt.Println(err)
+			continue
 		}
 
-		for _, token := range tokens {
-			fmt.Printf("%v: %v\n", token.Type, token.Value)
+		expression, err := lisp.ParseExpression(tokens)
+		if err != nil {
+			fmt.Println(err)
+			continue
 		}
+
+		expression.Dump(0)
 	}
 }
