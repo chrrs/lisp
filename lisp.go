@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("clisp v0")
+	fmt.Println("clisp REPL (Ctrl-C to exit)")
 
 	scanner := bufio.NewScanner(os.Stdin)
 
