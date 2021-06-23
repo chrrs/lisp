@@ -45,10 +45,10 @@ type Token struct {
 	Value string
 }
 
-type UnexpectedToken uint8
+type UnexpectedCharacter uint8
 
-func (t UnexpectedToken) Error() string {
-	return fmt.Sprintf("unexpected token in input: %c", uint8(t))
+func (t UnexpectedCharacter) Error() string {
+	return fmt.Sprintf("unexpected character in input: %c", uint8(t))
 }
 
 func Tokenize(input string) ([]Token, error) {
@@ -69,7 +69,7 @@ func Tokenize(input string) ([]Token, error) {
 		}
 
 		if !parsed {
-			return nil, UnexpectedToken(toParse[0])
+			return nil, UnexpectedCharacter(toParse[0])
 		}
 	}
 
