@@ -22,13 +22,13 @@ func main() {
 		input := scanner.Text()
 		tokens, err := lisp.Tokenize(input)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("tokenization error:", err)
 			continue
 		}
 
 		expression, err := lisp.ParseExpression(tokens)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("parsing error:", err)
 			continue
 		}
 
