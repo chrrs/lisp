@@ -73,9 +73,21 @@ func (e ExpressionNode) Evaluate() (int, error) {
 			return 0, errors.New("incorrect number of arguments for division operation")
 		}
 
-		return e.repeatOperation(func(x, y int) int {
-			return x / y
-		})
+		x, err := e.Nodes[0].Evaluate()
+		if err != nil {
+			return 0, nil
+		}
+
+		y, err := e.Nodes[1].Evaluate()
+		if err != nil {
+			return 0, nil
+		}
+
+		if y == 0 {
+			return 0, errors.New("division by zero")
+		}
+
+		return x / y, nil
 	default:
 		return 0, errors.New("unknown operation " + e.Operation)
 	}
