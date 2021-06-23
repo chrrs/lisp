@@ -24,26 +24,61 @@ func (e ExpressionNode) Dump(depth int) {
 	}
 }
 
+func (e ExpressionNode) repeatOperation(op func(int, int) int) (int, error) {
+	ret, err := e.Nodes[0].Evaluate()
+	if err != nil {
+		return 0, err
+	}
+
+	for _, node := range e.Nodes[1:] {
+		val, err := node.Evaluate()
+		if err != nil {
+			return 0, err
+		}
+
+		ret = op(ret, val)
+	}
+
+	return ret, nil
+}
+
 func (e ExpressionNode) Evaluate() (int, error) {
 	switch e.Operation {
 	case "+":
 		if len(e.Nodes) < 2 {
-			return 0, errors.New("not enough arguments for operation " + e.Operation)
+			return 0, errors.New("not enough arguments for addition operation")
 		}
 
-		ret := 0
-		for _, node := range e.Nodes {
-			val, err := node.Evaluate()
-			if err != nil {
-				return 0, err
-			}
-
-			ret += val
+		return e.repeatOperation(func(x, y int) int {
+			return x + y
+		})
+	case "-":
+		if len(e.Nodes) < 2 {
+			return 0, errors.New("not enough arguments for subtraction operation")
 		}
-		return ret, nil
+
+		return e.repeatOperation(func(x, y int) int {
+			return x - y
+		})
+	case "*":
+		if len(e.Nodes) < 2 {
+			return 0, errors.New("not enough arguments for multiplication operation")
+		}
+
+		return e.repeatOperation(func(x, y int) int {
+			return x * y
+		})
+	case "/":
+		if len(e.Nodes) != 2 {
+			return 0, errors.New("incorrect number of arguments for division operation")
+		}
+
+		return e.repeatOperation(func(x, y int) int {
+			return x / y
+		})
+	default:
+		return 0, errors.New("unknown operation " + e.Operation)
 	}
-
-	return 0, nil
 }
 
 type ValueNode struct {
