@@ -45,6 +45,10 @@ type Token struct {
 	Value string
 }
 
+func (t Token) String() string {
+	return fmt.Sprintf("%v(%v)", t.Type, t.Value)
+}
+
 type UnexpectedCharacter uint8
 
 func (t UnexpectedCharacter) Error() string {
