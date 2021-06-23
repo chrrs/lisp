@@ -1,6 +1,7 @@
 package lisp
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -8,6 +9,7 @@ import (
 
 type Node interface {
 	Dump(depth int)
+	Evaluate() (int, error)
 }
 
 type ExpressionNode struct {
@@ -22,12 +24,38 @@ func (e ExpressionNode) Dump(depth int) {
 	}
 }
 
+func (e ExpressionNode) Evaluate() (int, error) {
+	switch e.Operation {
+	case "+":
+		if len(e.Nodes) < 2 {
+			return 0, errors.New("not enough arguments for operation " + e.Operation)
+		}
+
+		ret := 0
+		for _, node := range e.Nodes {
+			val, err := node.Evaluate()
+			if err != nil {
+				return 0, err
+			}
+
+			ret += val
+		}
+		return ret, nil
+	}
+
+	return 0, nil
+}
+
 type ValueNode struct {
 	Value int
 }
 
 func (v ValueNode) Dump(depth int) {
 	fmt.Println(strings.Repeat("  ", depth), "Value", v.Value)
+}
+
+func (v ValueNode) Evaluate() (int, error) {
+	return v.Value, nil
 }
 
 type UnexpectedToken Token
@@ -55,10 +83,19 @@ func trimWhitespace(input *[]Token) bool {
 	}
 }
 
-func findLast(input []Token, type_ TokenType) int {
-	for i := len(input) - 1; i >= 0; i-- {
-		if input[i].Type == type_ {
-			return i
+func findMatchingClose(input []Token) int {
+	depth := 0
+
+	for i, token := range input {
+		switch token.Type {
+		case Open:
+			depth++
+		case Close:
+			depth--
+
+			if depth == 0 {
+				return i
+			}
 		}
 	}
 
@@ -91,7 +128,7 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 
 			input = input[1:]
 		case Open:
-			closeIndex := findLast(input, Close)
+			closeIndex := findMatchingClose(input)
 			if closeIndex == -1 {
 				return ExpressionNode{}, UnexpectedEOI{}
 			}
