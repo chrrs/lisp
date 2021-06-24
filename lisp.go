@@ -32,6 +32,8 @@ func main() {
 			continue
 		}
 
-		fmt.Println(expression.Evaluate())
+		env := make(lisp.Environment)
+		env.AddBuiltins()
+		fmt.Println(expression.Evaluate(env))
 	}
 }

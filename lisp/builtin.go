@@ -5,7 +5,9 @@ import (
 	"fmt"
 )
 
-func Add(args []Node) Node {
+type Builtin func(Environment, []Node) Node
+
+func Add(_ Environment, args []Node) Node {
 	sum := 0
 	for _, n := range args {
 		n, ok := n.(NumberNode)
@@ -17,7 +19,7 @@ func Add(args []Node) Node {
 	return NumberNode(sum)
 }
 
-func Sub(args []Node) Node {
+func Sub(_ Environment, args []Node) Node {
 	if len(args) == 1 {
 		n, ok := args[0].(NumberNode)
 		if !ok {
@@ -42,7 +44,7 @@ func Sub(args []Node) Node {
 	return sum
 }
 
-func Mul(args []Node) Node {
+func Mul(_ Environment, args []Node) Node {
 	sum, ok := args[0].(NumberNode)
 	if !ok {
 		return ErrorNode{errors.New("cannot operate on non-number")}
@@ -59,7 +61,7 @@ func Mul(args []Node) Node {
 	return sum
 }
 
-func Div(args []Node) Node {
+func Div(_ Environment, args []Node) Node {
 	sum, ok := args[0].(NumberNode)
 	if !ok {
 		return ErrorNode{errors.New("cannot operate on non-number")}
@@ -76,7 +78,7 @@ func Div(args []Node) Node {
 	return sum
 }
 
-func Head(args []Node) Node {
+func Head(_ Environment, args []Node) Node {
 	if len(args) > 1 {
 		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
 	}
@@ -93,7 +95,7 @@ func Head(args []Node) Node {
 	return expr.Nodes[0]
 }
 
-func Tail(args []Node) Node {
+func Tail(_ Environment, args []Node) Node {
 	if len(args) > 1 {
 		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
 	}
@@ -110,11 +112,11 @@ func Tail(args []Node) Node {
 	return ExpressionNode{QExpression, expr.Nodes[1:]}
 }
 
-func List(args []Node) Node {
+func List(_ Environment, args []Node) Node {
 	return ExpressionNode{QExpression, args}
 }
 
-func Eval(args []Node) Node {
+func Eval(env Environment, args []Node) Node {
 	if len(args) > 1 {
 		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
 	}
@@ -124,10 +126,10 @@ func Eval(args []Node) Node {
 		return ErrorNode{errors.New(fmt.Sprintf("cannot operate on non-qexpression"))}
 	}
 
-	return expr.EvalAsSExpr()
+	return expr.EvalAsSExpr(env)
 }
 
-func Join(args []Node) Node {
+func Join(_ Environment, args []Node) Node {
 	nodes := make([]Node, 0)
 	for _, n := range args {
 		expr, ok := n.(ExpressionNode)

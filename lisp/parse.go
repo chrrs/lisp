@@ -8,7 +8,7 @@ import (
 
 type Node interface {
 	fmt.Stringer
-	Evaluate() Node
+	Evaluate(env Environment) Node
 }
 
 type ExpressionType uint8
@@ -69,6 +69,14 @@ type ErrorNode struct {
 
 func (e ErrorNode) String() string {
 	return "runtime error: " + e.Error.Error()
+}
+
+type FunctionNode struct {
+	Builtin Builtin
+}
+
+func (f FunctionNode) String() string {
+	return "<function>"
 }
 
 type UnexpectedToken Token
