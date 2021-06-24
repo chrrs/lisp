@@ -1,7 +1,6 @@
 package lisp
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -9,23 +8,25 @@ import (
 
 type Node interface {
 	Dump(depth int)
-	Evaluate() (int, error)
 }
 
 type ExpressionNode struct {
-	Operation string
 	Nodes     []Node
 }
 
 func (e ExpressionNode) Dump(depth int) {
-	fmt.Println(strings.Repeat("  ", depth), "Expression", e.Operation)
+	fmt.Println(strings.Repeat("  ", depth), "Expression")
 	for _, n := range e.Nodes {
 		n.Dump(depth + 1)
 	}
 }
 
+type IdentifierNode struct {
+	Name string
 }
 
+func (i IdentifierNode) Dump(depth int) {
+	fmt.Println(strings.Repeat("  ", depth), "Identifier", i.Name)
 }
 
 type ValueNode struct {
@@ -83,23 +84,17 @@ func findMatchingClose(input []Token) int {
 func ParseExpression(input []Token) (ExpressionNode, error) {
 	trimWhitespace(&input)
 
-	if len(input) == 0 {
-		return ExpressionNode{}, UnexpectedEOI{}
-	}
-
-	if input[0].Type != Identifier {
-		return ExpressionNode{}, UnexpectedToken(input[0])
-	}
-
 	ret := ExpressionNode{}
-	ret.Operation, input = input[0].Value, input[1:]
 
-	for trimWhitespace(&input) {
+	for {
 		if len(input) == 0 {
-			break
+			return ret, nil
 		}
 
 		switch input[0].Type {
+		case Identifier:
+			ret.Nodes = append(ret.Nodes, IdentifierNode{input[0].Value})
+			input = input[1:]
 		case Number:
 			value, _ := strconv.Atoi(input[0].Value)
 			ret.Nodes = append(ret.Nodes, ValueNode{value})
@@ -122,7 +117,13 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 		default:
 			return ExpressionNode{}, UnexpectedToken(input[0])
 		}
-	}
 
-	return ret, nil
+		if !trimWhitespace(&input) {
+			if len(input) != 0 {
+				return ExpressionNode{}, UnexpectedToken(input[0])
+			}
+
+			return ret, nil
+		}
+	}
 }
