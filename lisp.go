@@ -26,7 +26,7 @@ func main() {
 			continue
 		}
 
-		expression, err := lisp.ParseExpression(tokens)
+		expression, err := lisp.ParseExpression(tokens, lisp.SExpression)
 		if err != nil {
 			fmt.Println("parsing error:", err)
 			continue

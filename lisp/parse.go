@@ -1,6 +1,7 @@
 package lisp
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -14,6 +15,7 @@ type ExpressionType uint8
 
 const (
 	SExpression ExpressionType = iota
+	QExpression
 )
 
 type ExpressionNode struct {
@@ -27,6 +29,8 @@ func (e ExpressionNode) String() string {
 	switch e.Type {
 	case SExpression:
 		ret += "("
+	case QExpression:
+		ret += "{"
 	}
 
 	for i, node := range e.Nodes {
@@ -40,6 +44,8 @@ func (e ExpressionNode) String() string {
 	switch e.Type {
 	case SExpression:
 		ret += ")"
+	case QExpression:
+		ret += "}"
 	}
 
 	return ret
@@ -90,7 +96,7 @@ func trimWhitespace(input *[]Token) bool {
 	}
 }
 
-func findMatchingClose(input []Token) int {
+func findMatchingClose(input []Token, type_ ExpressionType) (int, error) {
 	depth := 0
 
 	for i, token := range input {
@@ -101,18 +107,29 @@ func findMatchingClose(input []Token) int {
 			depth--
 
 			if depth == 0 {
-				return i
+				switch type_ {
+				case SExpression:
+					if token.Value != ")" {
+						return 0, UnexpectedToken(token)
+					}
+				case QExpression:
+					if token.Value != "}" {
+						return 0, UnexpectedToken(token)
+					}
+				}
+
+				return i, nil
 			}
 		}
 	}
 
-	return -1
+	return 0, UnexpectedEOI{}
 }
 
-func ParseExpression(input []Token) (ExpressionNode, error) {
+func ParseExpression(input []Token, type_ ExpressionType) (ExpressionNode, error) {
 	trimWhitespace(&input)
 
-	ret := ExpressionNode{Type: SExpression}
+	ret := ExpressionNode{Type: type_}
 
 	for {
 		if len(input) == 0 {
@@ -129,12 +146,22 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 
 			input = input[1:]
 		case OpenToken:
-			closeIndex := findMatchingClose(input)
-			if closeIndex == -1 {
-				return ExpressionNode{}, UnexpectedEOI{}
+			var type_ ExpressionType
+			switch input[0].Value {
+			case "(":
+				type_ = SExpression
+			case "{":
+				type_ = QExpression
+			default:
+				return ExpressionNode{}, errors.New("unknown expression type for open bracket " + input[0].Value)
 			}
 
-			nestedExpression, err := ParseExpression(input[1:closeIndex])
+			closeIndex, err := findMatchingClose(input, type_)
+			if err != nil {
+				return ExpressionNode{}, err
+			}
+
+			nestedExpression, err := ParseExpression(input[1:closeIndex], type_)
 			if err != nil {
 				return ExpressionNode{}, err
 			}

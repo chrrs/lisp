@@ -3,6 +3,10 @@ package lisp
 import "errors"
 
 func (e ExpressionNode) Evaluate() Node {
+	if e.Type == QExpression {
+		return e
+	}
+
 	if len(e.Nodes) == 0 {
 		return e
 	}
