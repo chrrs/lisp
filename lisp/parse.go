@@ -3,38 +3,45 @@ package lisp
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 type Node interface {
-	Dump(depth int)
+	fmt.Stringer
 }
 
 type ExpressionNode struct {
 	Nodes     []Node
 }
 
-func (e ExpressionNode) Dump(depth int) {
-	fmt.Println(strings.Repeat("  ", depth), "Expression")
-	for _, n := range e.Nodes {
-		n.Dump(depth + 1)
+func (e ExpressionNode) String() string {
+	ret := "("
+
+	for i, node := range e.Nodes {
+		if i != 0 {
+			ret += " "
+		}
+
+		ret += node.String()
 	}
+
+	ret += ")"
+	return ret
 }
 
 type IdentifierNode struct {
 	Name string
 }
 
-func (i IdentifierNode) Dump(depth int) {
-	fmt.Println(strings.Repeat("  ", depth), "Identifier", i.Name)
+func (i IdentifierNode) String() string {
+	return i.Name
 }
 
 type ValueNode struct {
 	Value int
 }
 
-func (v ValueNode) Dump(depth int) {
-	fmt.Println(strings.Repeat("  ", depth), "Value", v.Value)
+func (v ValueNode) String() string {
+	return strconv.Itoa(v.Value)
 }
 
 type UnexpectedToken Token

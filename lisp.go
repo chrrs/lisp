@@ -32,6 +32,6 @@ func main() {
 			continue
 		}
 
-		expression.Dump(0)
+		fmt.Println(expression)
 	}
 }
