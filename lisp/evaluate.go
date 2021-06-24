@@ -51,7 +51,7 @@ func (e ExpressionNode) Evaluate() Node {
 		case "*":
 			ret *= arg.(NumberNode)
 		case "/":
-			if ret == 0 {
+			if arg.(NumberNode) == 0 {
 				return ErrorNode{errors.New("divide by zero")}
 			}
 
