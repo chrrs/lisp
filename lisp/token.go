@@ -37,7 +37,7 @@ var Patterns = map[TokenType]*regexp.Regexp{
 	OpenToken:       regexp.MustCompile("^[({]"),
 	CloseToken:      regexp.MustCompile("^[)}]"),
 	NumberToken:     regexp.MustCompile("^[+-]?\\d+"),
-	IdentifierToken: regexp.MustCompile("^[a-zA-Z0-9_+\\-*/\\\\=<>!&]+"),
+	IdentifierToken: regexp.MustCompile("^[a-zA-Z_+\\-*/\\\\=<>!&][a-zA-Z0-9_+\\-*/\\\\=<>!&]*"),
 }
 
 type Token struct {
