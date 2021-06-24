@@ -32,12 +32,6 @@ func main() {
 			continue
 		}
 
-		result, err := expression.Evaluate()
-		if err != nil {
-			fmt.Println("runtime error:", err)
-			continue
-		}
-
-		fmt.Println(result)
+		expression.Dump(0)
 	}
 }
