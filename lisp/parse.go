@@ -50,9 +50,9 @@ func (i IdentifierNode) String() string {
 	return string(i)
 }
 
-type ValueNode int
+type NumberNode int
 
-func (v ValueNode) String() string {
+func (v NumberNode) String() string {
 	return strconv.Itoa(int(v))
 }
 
@@ -124,7 +124,7 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 			input = input[1:]
 		case NumberToken:
 			value, _ := strconv.Atoi(input[0].Value)
-			ret.Nodes = append(ret.Nodes, ValueNode(value))
+			ret.Nodes = append(ret.Nodes, NumberNode(value))
 
 			input = input[1:]
 		case OpenToken:
