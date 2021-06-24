@@ -107,7 +107,11 @@ func (_ FunctionNode) TypeString() string {
 }
 
 func (f FunctionNode) String() string {
-	return "<function>"
+	if f.Builtin != nil {
+		return "<builtin>"
+	} else {
+		return fmt.Sprintf("(fn %v %v)", f.Formals, f.Body)
+	}
 }
 
 type UnexpectedToken Token
