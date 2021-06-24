@@ -7,12 +7,21 @@ import (
 
 type Builtin func(Environment, []Node) Node
 
+type IncorrectType struct {
+	Expected string
+	Actual   string
+}
+
+func (i IncorrectType) Error() string {
+	return fmt.Sprintf("expected %v, got %v", i.Expected, i.Actual)
+}
+
 func Add(_ Environment, args []Node) Node {
 	sum := 0
-	for _, n := range args {
-		n, ok := n.(NumberNode)
+	for _, node := range args {
+		n, ok := node.(NumberNode)
 		if !ok {
-			return ErrorNode{errors.New("cannot operate on non-number")}
+			return ErrorNode{IncorrectType{"Number", node.TypeString()}}
 		}
 		sum += int(n)
 	}
@@ -23,20 +32,20 @@ func Sub(_ Environment, args []Node) Node {
 	if len(args) == 1 {
 		n, ok := args[0].(NumberNode)
 		if !ok {
-			return ErrorNode{errors.New("cannot negate a non-number")}
+			return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
 		}
 		return -n
 	}
 
 	sum, ok := args[0].(NumberNode)
 	if !ok {
-		return ErrorNode{errors.New("cannot operate on non-number")}
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
 	}
 
-	for _, n := range args[1:] {
-		n, ok := n.(NumberNode)
+	for _, node := range args[1:] {
+		n, ok := node.(NumberNode)
 		if !ok {
-			return ErrorNode{errors.New("cannot operate on non-number")}
+			return ErrorNode{IncorrectType{"Number", node.TypeString()}}
 		}
 		sum -= n
 	}
@@ -47,13 +56,13 @@ func Sub(_ Environment, args []Node) Node {
 func Mul(_ Environment, args []Node) Node {
 	sum, ok := args[0].(NumberNode)
 	if !ok {
-		return ErrorNode{errors.New("cannot operate on non-number")}
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
 	}
 
-	for _, n := range args[1:] {
-		n, ok := n.(NumberNode)
+	for _, node := range args[1:] {
+		n, ok := node.(NumberNode)
 		if !ok {
-			return ErrorNode{errors.New("cannot operate on non-number")}
+			return ErrorNode{IncorrectType{"Number", node.TypeString()}}
 		}
 		sum *= n
 	}
@@ -64,13 +73,13 @@ func Mul(_ Environment, args []Node) Node {
 func Div(_ Environment, args []Node) Node {
 	sum, ok := args[0].(NumberNode)
 	if !ok {
-		return ErrorNode{errors.New("cannot operate on non-number")}
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
 	}
 
-	for _, n := range args[1:] {
-		n, ok := n.(NumberNode)
+	for _, node := range args[1:] {
+		n, ok := node.(NumberNode)
 		if !ok {
-			return ErrorNode{errors.New("cannot operate on non-number")}
+			return ErrorNode{IncorrectType{"Number", node.TypeString()}}
 		}
 		sum /= n
 	}
@@ -80,12 +89,12 @@ func Div(_ Environment, args []Node) Node {
 
 func Head(_ Environment, args []Node) Node {
 	if len(args) > 1 {
-		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
 	}
 
 	expr, ok := args[0].(ExpressionNode)
 	if !ok || expr.Type != QExpression {
-		return ErrorNode{errors.New(fmt.Sprintf("cannot operate on non-qexpression"))}
+		return ErrorNode{IncorrectType{"Q-Expression", args[0].TypeString()}}
 	}
 
 	if len(expr.Nodes) == 0 {
@@ -102,7 +111,7 @@ func Tail(_ Environment, args []Node) Node {
 
 	expr, ok := args[0].(ExpressionNode)
 	if !ok || expr.Type != QExpression {
-		return ErrorNode{errors.New(fmt.Sprintf("cannot operate on non-qexpression"))}
+		return ErrorNode{IncorrectType{"Q-Expression", args[0].TypeString()}}
 	}
 
 	if len(expr.Nodes) == 0 {
@@ -134,7 +143,7 @@ func Join(_ Environment, args []Node) Node {
 	for _, n := range args {
 		expr, ok := n.(ExpressionNode)
 		if !ok || expr.Type != QExpression {
-			return ErrorNode{errors.New("cannot operate on non-qexpression")}
+			return ErrorNode{IncorrectType{"Q-Expression", n.TypeString()}}
 		}
 		nodes = append(nodes, expr.Nodes...)
 	}

@@ -8,6 +8,7 @@ import (
 
 type Node interface {
 	fmt.Stringer
+	TypeString() string
 	Evaluate(env Environment) Node
 }
 
@@ -21,6 +22,17 @@ const (
 type ExpressionNode struct {
 	Type  ExpressionType
 	Nodes []Node
+}
+
+func (e ExpressionNode) TypeString() string {
+	switch e.Type {
+	case SExpression:
+		return "S-Expression"
+	case QExpression:
+		return "Q-Expression"
+	default:
+		return "Expression"
+	}
 }
 
 func (e ExpressionNode) String() string {
@@ -53,11 +65,19 @@ func (e ExpressionNode) String() string {
 
 type IdentifierNode string
 
+func (_ IdentifierNode) TypeString() string {
+	return "Identifier"
+}
+
 func (i IdentifierNode) String() string {
 	return string(i)
 }
 
 type NumberNode int
+
+func (_ NumberNode) TypeString() string {
+	return "Number"
+}
 
 func (v NumberNode) String() string {
 	return strconv.Itoa(int(v))
@@ -67,12 +87,20 @@ type ErrorNode struct {
 	Error error
 }
 
+func (_ ErrorNode) TypeString() string {
+	return "Error"
+}
+
 func (e ErrorNode) String() string {
 	return "runtime error: " + e.Error.Error()
 }
 
 type FunctionNode struct {
 	Builtin Builtin
+}
+
+func (_ FunctionNode) TypeString() string {
+	return "Function"
 }
 
 func (f FunctionNode) String() string {

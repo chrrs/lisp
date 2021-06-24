@@ -41,7 +41,7 @@ func (e ExpressionNode) EvalAsSExpr(env Environment) Node {
 
 	fun, ok := op.(FunctionNode)
 	if !ok {
-		return ErrorNode{errors.New("s-expressions should start with an function")}
+		return ErrorNode{errors.New("S-Expressions should start with an function")}
 	}
 
 	return fun.Builtin(env, args)
