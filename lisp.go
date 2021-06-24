@@ -12,6 +12,9 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
+	env := make(lisp.Environment)
+	env.AddBuiltins()
+
 	for {
 		fmt.Print("> ")
 
@@ -32,8 +35,6 @@ func main() {
 			continue
 		}
 
-		env := make(lisp.Environment)
-		env.AddBuiltins()
-		fmt.Println(expression.Evaluate(env))
+		fmt.Println(expression.Evaluate(&env))
 	}
 }

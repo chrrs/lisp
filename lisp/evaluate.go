@@ -4,20 +4,21 @@ import "errors"
 
 type Environment map[IdentifierNode]Node
 
-func (env Environment) AddBuiltins() {
-	env["+"] = FunctionNode{Add}
-	env["-"] = FunctionNode{Sub}
-	env["*"] = FunctionNode{Mul}
-	env["/"] = FunctionNode{Div}
+func (env *Environment) AddBuiltins() {
+	(*env)["+"] = FunctionNode{Add}
+	(*env)["-"] = FunctionNode{Sub}
+	(*env)["*"] = FunctionNode{Mul}
+	(*env)["/"] = FunctionNode{Div}
 
-	env["head"] = FunctionNode{Head}
-	env["tail"] = FunctionNode{Tail}
-	env["list"] = FunctionNode{List}
-	env["eval"] = FunctionNode{Eval}
-	env["join"] = FunctionNode{Join}
+	(*env)["head"] = FunctionNode{Head}
+	(*env)["tail"] = FunctionNode{Tail}
+	(*env)["list"] = FunctionNode{List}
+	(*env)["eval"] = FunctionNode{Eval}
+	(*env)["join"] = FunctionNode{Join}
+	(*env)["def"] = FunctionNode{Def}
 }
 
-func (e ExpressionNode) EvalAsSExpr(env Environment) Node {
+func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {
 	if len(e.Nodes) == 0 {
 		return e
 	}
@@ -47,7 +48,7 @@ func (e ExpressionNode) EvalAsSExpr(env Environment) Node {
 	return fun.Builtin(env, args)
 }
 
-func (e ExpressionNode) Evaluate(env Environment) Node {
+func (e ExpressionNode) Evaluate(env *Environment) Node {
 	if e.Type == QExpression {
 		return e
 	}
@@ -55,8 +56,8 @@ func (e ExpressionNode) Evaluate(env Environment) Node {
 	return e.EvalAsSExpr(env)
 }
 
-func (i IdentifierNode) Evaluate(env Environment) Node {
-	node, ok := env[i]
+func (i IdentifierNode) Evaluate(env *Environment) Node {
+	node, ok := (*env)[i]
 	if !ok {
 		return ErrorNode{errors.New("unknown identifier " + string(i))}
 	}
@@ -64,14 +65,14 @@ func (i IdentifierNode) Evaluate(env Environment) Node {
 	return node
 }
 
-func (v NumberNode) Evaluate(_ Environment) Node {
+func (v NumberNode) Evaluate(_ *Environment) Node {
 	return v
 }
 
-func (e ErrorNode) Evaluate(_ Environment) Node {
+func (e ErrorNode) Evaluate(_ *Environment) Node {
 	return e
 }
 
-func (f FunctionNode) Evaluate(_ Environment) Node {
+func (f FunctionNode) Evaluate(_ *Environment) Node {
 	return f
 }

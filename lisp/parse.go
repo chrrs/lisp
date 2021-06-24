@@ -9,7 +9,7 @@ import (
 type Node interface {
 	fmt.Stringer
 	TypeString() string
-	Evaluate(env Environment) Node
+	Evaluate(env *Environment) Node
 }
 
 type ExpressionType uint8
