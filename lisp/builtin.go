@@ -122,11 +122,11 @@ func Eval(env Environment, args []Node) Node {
 	}
 
 	expr, ok := args[0].(ExpressionNode)
-	if !ok {
-		return ErrorNode{errors.New(fmt.Sprintf("cannot operate on non-qexpression"))}
+	if ok {
+		return expr.EvalAsSExpr(env)
+	} else {
+		return args[0].Evaluate(env)
 	}
-
-	return expr.EvalAsSExpr(env)
 }
 
 func Join(_ Environment, args []Node) Node {
