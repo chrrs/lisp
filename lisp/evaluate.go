@@ -2,11 +2,7 @@ package lisp
 
 import "errors"
 
-func (e ExpressionNode) Evaluate() Node {
-	if e.Type == QExpression {
-		return e
-	}
-
+func (e ExpressionNode) EvalAsSExpr() Node {
 	if len(e.Nodes) == 0 {
 		return e
 	}
@@ -33,37 +29,26 @@ func (e ExpressionNode) Evaluate() Node {
 		return ErrorNode{errors.New("s-expressions should start with an identifier")}
 	}
 
-	for _, arg := range args {
-		_, ok := arg.(NumberNode)
-		if !ok {
-			return ErrorNode{errors.New("cannot operate on a non-number")}
-		}
+	switch op {
+	case "+":
+		return Add(args)
+	case "-":
+		return Sub(args)
+	case "*":
+		return Mul(args)
+	case "/":
+		return Div(args)
+	default:
+		return ErrorNode{errors.New("unknown identifier " + string(op))}
+	}
+}
+
+func (e ExpressionNode) Evaluate() Node {
+	if e.Type == QExpression {
+		return e
 	}
 
-	if len(args) == 1 && op == "-" {
-		return -args[0].(NumberNode)
-	}
-
-	ret := args[0].(NumberNode)
-
-	for _, arg := range args[1:] {
-		switch op {
-		case "+":
-			ret += arg.(NumberNode)
-		case "-":
-			ret -= arg.(NumberNode)
-		case "*":
-			ret *= arg.(NumberNode)
-		case "/":
-			if arg.(NumberNode) == 0 {
-				return ErrorNode{errors.New("divide by zero")}
-			}
-
-			ret /= arg.(NumberNode)
-		}
-	}
-
-	return ret
+	return e.EvalAsSExpr()
 }
 
 func (i IdentifierNode) Evaluate() Node {
