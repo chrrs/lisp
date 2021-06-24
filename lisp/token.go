@@ -36,7 +36,7 @@ var Patterns = map[TokenType]*regexp.Regexp{
 	WhitespaceToken: regexp.MustCompile("^\\s+"),
 	OpenToken:       regexp.MustCompile("^\\("),
 	CloseToken:      regexp.MustCompile("^\\)"),
-	NumberToken:     regexp.MustCompile("^\\d+"),
+	NumberToken:     regexp.MustCompile("^[+-]?\\d+"),
 	IdentifierToken: regexp.MustCompile("^[+\\-/*]"),
 }
 

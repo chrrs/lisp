@@ -36,6 +36,10 @@ func (e ExpressionNode) Evaluate() Node {
 		}
 	}
 
+	if len(args) == 1 && op == "-" {
+		return -args[0].(NumberNode)
+	}
+
 	ret := args[0].(NumberNode)
 
 	for _, arg := range args[1:] {
