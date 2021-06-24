@@ -1,21 +1,58 @@
 package lisp
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
-type Environment map[IdentifierNode]Node
+type Environment struct {
+	Parent *Environment
+	values map[IdentifierNode]Node
+}
+
+func NewEnvironment(parent *Environment) Environment {
+	return Environment{parent, make(map[IdentifierNode]Node)}
+}
+
+func (env *Environment) Get(id IdentifierNode) Node {
+	node, ok := env.values[id]
+	if ok {
+		return node
+	}
+
+	if env.Parent != nil {
+		return env.Parent.Get(id)
+	}
+
+	return nil
+}
+
+func (env *Environment) Put(id IdentifierNode, value Node) {
+	env.values[id] = value
+}
+
+func (env *Environment) Def(id IdentifierNode, value Node) {
+	if env.Parent != nil {
+		env.Parent.Def(id, value)
+		return
+	}
+
+	env.Put(id, value)
+}
 
 func (env *Environment) AddBuiltins() {
-	(*env)["+"] = FunctionNode{Add}
-	(*env)["-"] = FunctionNode{Sub}
-	(*env)["*"] = FunctionNode{Mul}
-	(*env)["/"] = FunctionNode{Div}
+	env.Def("+", FunctionNode{Builtin: Add})
+	env.Def("-", FunctionNode{Builtin: Sub})
+	env.Def("*", FunctionNode{Builtin: Mul})
+	env.Def("/", FunctionNode{Builtin: Div})
 
-	(*env)["head"] = FunctionNode{Head}
-	(*env)["tail"] = FunctionNode{Tail}
-	(*env)["list"] = FunctionNode{List}
-	(*env)["eval"] = FunctionNode{Eval}
-	(*env)["join"] = FunctionNode{Join}
-	(*env)["def"] = FunctionNode{Def}
+	env.Def("head", FunctionNode{Builtin: Head})
+	env.Def("tail", FunctionNode{Builtin: Tail})
+	env.Def("list", FunctionNode{Builtin: List})
+	env.Def("eval", FunctionNode{Builtin: Eval})
+	env.Def("join", FunctionNode{Builtin: Join})
+	env.Def("def", FunctionNode{Builtin: Def})
+	env.Def("let", FunctionNode{Builtin: Let})
 }
 
 func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {
@@ -57,8 +94,8 @@ func (e ExpressionNode) Evaluate(env *Environment) Node {
 }
 
 func (i IdentifierNode) Evaluate(env *Environment) Node {
-	node, ok := (*env)[i]
-	if !ok {
+	node := env.Get(i)
+	if node == nil {
 		return ErrorNode{errors.New("unknown identifier " + string(i))}
 	}
 

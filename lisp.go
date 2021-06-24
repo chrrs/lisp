@@ -12,7 +12,7 @@ func main() {
 
 	scanner := bufio.NewScanner(os.Stdin)
 
-	env := make(lisp.Environment)
+	env := lisp.NewEnvironment(nil)
 	env.AddBuiltins()
 
 	for {

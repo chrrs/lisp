@@ -150,7 +150,7 @@ func Join(_ *Environment, args []Node) Node {
 	return ExpressionNode{QExpression, nodes}
 }
 
-func Def(env *Environment, args []Node) Node {
+func val(env *Environment, args []Node, global bool) Node {
 	expr, ok := args[0].(ExpressionNode)
 	if !ok || expr.Type != QExpression {
 		return ErrorNode{IncorrectType{"Q-Expression", args[0].TypeString()}}
@@ -169,8 +169,20 @@ func Def(env *Environment, args []Node) Node {
 	}
 
 	for i := range args {
-		(*env)[expr.Nodes[i].(IdentifierNode)] = args[i]
+		if global {
+			env.Def(expr.Nodes[i].(IdentifierNode), args[i])
+		} else {
+			env.Put(expr.Nodes[i].(IdentifierNode), args[i])
+		}
 	}
 
 	return ExpressionNode{Type: SExpression}
+}
+
+func Let(env *Environment, args []Node) Node {
+	return val(env, args, false)
+}
+
+func Def(env *Environment, args []Node) Node {
+	return val(env, args, true)
 }
