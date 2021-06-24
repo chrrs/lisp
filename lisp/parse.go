@@ -44,20 +44,16 @@ func (e ExpressionNode) String() string {
 	return ret
 }
 
-type IdentifierNode struct {
-	Name string
-}
+type IdentifierNode string
 
 func (i IdentifierNode) String() string {
-	return i.Name
+	return string(i)
 }
 
-type ValueNode struct {
-	Value int
-}
+type ValueNode int
 
 func (v ValueNode) String() string {
-	return strconv.Itoa(v.Value)
+	return strconv.Itoa(v)
 }
 
 type UnexpectedToken Token
@@ -116,11 +112,11 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 
 		switch input[0].Type {
 		case IdentifierToken:
-			ret.Nodes = append(ret.Nodes, IdentifierNode{input[0].Value})
+			ret.Nodes = append(ret.Nodes, IdentifierNode(input[0].Value))
 			input = input[1:]
 		case NumberToken:
 			value, _ := strconv.Atoi(input[0].Value)
-			ret.Nodes = append(ret.Nodes, ValueNode{value})
+			ret.Nodes = append(ret.Nodes, ValueNode(value))
 
 			input = input[1:]
 		case OpenToken:
