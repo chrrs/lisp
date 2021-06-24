@@ -53,6 +53,7 @@ func (env *Environment) AddBuiltins() {
 	env.Def("join", FunctionNode{Builtin: Join})
 	env.Def("def", FunctionNode{Builtin: Def})
 	env.Def("let", FunctionNode{Builtin: Let})
+	env.Def("fn", FunctionNode{Builtin: Fn})
 }
 
 func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {
@@ -82,7 +83,7 @@ func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {
 		return ErrorNode{errors.New("S-Expressions should start with an function")}
 	}
 
-	return fun.Builtin(env, args)
+	return fun.call(env, args)
 }
 
 func (e ExpressionNode) Evaluate(env *Environment) Node {
@@ -108,6 +109,37 @@ func (v NumberNode) Evaluate(_ *Environment) Node {
 
 func (e ErrorNode) Evaluate(_ *Environment) Node {
 	return e
+}
+
+func (f FunctionNode) call(env *Environment, args []Node) Node {
+	if f.Builtin != nil {
+		return f.Builtin(env, args)
+	}
+
+	formals := f.Formals
+
+	for _, arg := range args {
+		if len(formals) == 0 {
+			return ErrorNode{fmt.Errorf("expected %v arguments, got %v", len(f.Formals), len(args))}
+		}
+
+		ident := formals[0]
+		formals = formals[1:]
+		f.Environment.Put(ident, arg)
+	}
+
+	if len(formals) == 0 {
+		f.Environment.Parent = env
+		return f.Body.EvalAsSExpr(f.Environment)
+	}
+
+	return FunctionNode{
+		Builtin:     nil,
+		Environment: f.Environment,
+		Formals:     formals,
+		Body:        f.Body,
+	}
+
 }
 
 func (f FunctionNode) Evaluate(_ *Environment) Node {

@@ -96,7 +96,10 @@ func (e ErrorNode) String() string {
 }
 
 type FunctionNode struct {
-	Builtin Builtin
+	Builtin     Builtin
+	Environment *Environment
+	Formals     []IdentifierNode
+	Body        ExpressionNode
 }
 
 func (_ FunctionNode) TypeString() string {

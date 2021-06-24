@@ -186,3 +186,35 @@ func Let(env *Environment, args []Node) Node {
 func Def(env *Environment, args []Node) Node {
 	return val(env, args, true)
 }
+
+func Fn(env *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 2 arguments, got %v", len(args))}
+	}
+
+	for _, n := range args {
+		expr, ok := n.(ExpressionNode)
+		if !ok || expr.Type != QExpression {
+			return ErrorNode{IncorrectType{"Q-Expression", n.TypeString()}}
+		}
+	}
+
+	nodes := args[0].(ExpressionNode).Nodes
+	formals := make([]IdentifierNode, 0, len(nodes))
+	for _, node := range nodes {
+		i, ok := node.(IdentifierNode)
+		if !ok {
+			return ErrorNode{IncorrectType{"Identifier", node.TypeString()}}
+		}
+
+		formals = append(formals, i)
+	}
+
+	subEnv := NewEnvironment(nil)
+
+	return FunctionNode{
+		Environment: &subEnv,
+		Formals:     formals,
+		Body:        args[1].(ExpressionNode),
+	}
+}
