@@ -53,7 +53,15 @@ func (i IdentifierNode) String() string {
 type ValueNode int
 
 func (v ValueNode) String() string {
-	return strconv.Itoa(v)
+	return strconv.Itoa(int(v))
+}
+
+type ErrorNode struct {
+	Error error
+}
+
+func (e ErrorNode) String() string {
+	return "Error: " + e.Error.Error()
 }
 
 type UnexpectedToken Token
