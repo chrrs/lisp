@@ -9,12 +9,24 @@ type Node interface {
 	fmt.Stringer
 }
 
+type ExpressionType uint8
+
+const (
+	SExpression ExpressionType = iota
+)
+
 type ExpressionNode struct {
-	Nodes     []Node
+	Type  ExpressionType
+	Nodes []Node
 }
 
 func (e ExpressionNode) String() string {
-	ret := "("
+	ret := ""
+
+	switch e.Type {
+	case SExpression:
+		ret += "("
+	}
 
 	for i, node := range e.Nodes {
 		if i != 0 {
@@ -24,7 +36,11 @@ func (e ExpressionNode) String() string {
 		ret += node.String()
 	}
 
-	ret += ")"
+	switch e.Type {
+	case SExpression:
+		ret += ")"
+	}
+
 	return ret
 }
 
@@ -91,7 +107,7 @@ func findMatchingClose(input []Token) int {
 func ParseExpression(input []Token) (ExpressionNode, error) {
 	trimWhitespace(&input)
 
-	ret := ExpressionNode{}
+	ret := ExpressionNode{Type: SExpression}
 
 	for {
 		if len(input) == 0 {
