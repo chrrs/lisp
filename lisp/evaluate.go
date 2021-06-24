@@ -29,18 +29,24 @@ func (e ExpressionNode) EvalAsSExpr() Node {
 		return ErrorNode{errors.New("s-expressions should start with an identifier")}
 	}
 
-	switch op {
-	case "+":
-		return Add(args)
-	case "-":
-		return Sub(args)
-	case "*":
-		return Mul(args)
-	case "/":
-		return Div(args)
-	default:
-		return ErrorNode{errors.New("unknown identifier " + string(op))}
+	builtin := map[IdentifierNode]func([]Node)Node{
+		"+": Add,
+		"-": Sub,
+		"*": Mul,
+		"/": Div,
+		"head": Head,
+		"tail": Tail,
+		"list": List,
+		"eval": Eval,
+		"join": Join,
 	}
+
+	fun, ok := builtin[op]
+	if ok {
+		return fun(args)
+	}
+
+	return ErrorNode{errors.New("unknown identifier " + string(op))}
 }
 
 func (e ExpressionNode) Evaluate() Node {
