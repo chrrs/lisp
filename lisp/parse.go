@@ -77,7 +77,7 @@ func trimWhitespace(input *[]Token) bool {
 		return false
 	}
 
-	if (*input)[0].Type == Whitespace {
+	if (*input)[0].Type == WhitespaceToken {
 		*input = (*input)[1:]
 		return true
 	} else {
@@ -90,9 +90,9 @@ func findMatchingClose(input []Token) int {
 
 	for i, token := range input {
 		switch token.Type {
-		case Open:
+		case OpenToken:
 			depth++
-		case Close:
+		case CloseToken:
 			depth--
 
 			if depth == 0 {
@@ -115,15 +115,15 @@ func ParseExpression(input []Token) (ExpressionNode, error) {
 		}
 
 		switch input[0].Type {
-		case Identifier:
+		case IdentifierToken:
 			ret.Nodes = append(ret.Nodes, IdentifierNode{input[0].Value})
 			input = input[1:]
-		case Number:
+		case NumberToken:
 			value, _ := strconv.Atoi(input[0].Value)
 			ret.Nodes = append(ret.Nodes, ValueNode{value})
 
 			input = input[1:]
-		case Open:
+		case OpenToken:
 			closeIndex := findMatchingClose(input)
 			if closeIndex == -1 {
 				return ExpressionNode{}, UnexpectedEOI{}

@@ -9,15 +9,15 @@ type TokenType uint8
 
 func (t TokenType) String() string {
 	switch t {
-	case Whitespace:
+	case WhitespaceToken:
 		return "Whitespace"
-	case Open:
+	case OpenToken:
 		return "Open"
-	case Close:
+	case CloseToken:
 		return "Close"
-	case Number:
+	case NumberToken:
 		return "Number"
-	case Identifier:
+	case IdentifierToken:
 		return "Identifier"
 	default:
 		return "<unknown>"
@@ -25,19 +25,19 @@ func (t TokenType) String() string {
 }
 
 const (
-	Whitespace TokenType = iota
-	Open
-	Close
-	Number
-	Identifier
+	WhitespaceToken TokenType = iota
+	OpenToken
+	CloseToken
+	NumberToken
+	IdentifierToken
 )
 
 var Patterns = map[TokenType]*regexp.Regexp{
-	Whitespace: regexp.MustCompile("^\\s+"),
-	Open: regexp.MustCompile("^\\("),
-	Close: regexp.MustCompile("^\\)"),
-	Number: regexp.MustCompile("^\\d+"),
-	Identifier: regexp.MustCompile("^[+\\-/*]"),
+	WhitespaceToken: regexp.MustCompile("^\\s+"),
+	OpenToken:       regexp.MustCompile("^\\("),
+	CloseToken:      regexp.MustCompile("^\\)"),
+	NumberToken:     regexp.MustCompile("^\\d+"),
+	IdentifierToken: regexp.MustCompile("^[+\\-/*]"),
 }
 
 type Token struct {
