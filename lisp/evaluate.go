@@ -118,14 +118,32 @@ func (f FunctionNode) call(env *Environment, args []Node) Node {
 
 	formals := f.Formals
 
-	for _, arg := range args {
+	for i, arg := range args {
 		if len(formals) == 0 {
 			return ErrorNode{fmt.Errorf("expected %v arguments, got %v", len(f.Formals), len(args))}
 		}
 
 		ident := formals[0]
 		formals = formals[1:]
+
+		if ident == "&" {
+			if len(formals) != 1 {
+				return ErrorNode{fmt.Errorf("expected 1 variadic argument, got %v", len(formals))}
+			}
+
+			ident = formals[0]
+			formals = formals[:0]
+			f.Environment.Put(ident, ExpressionNode{QExpression, args[i:]})
+
+			break
+		}
+
 		f.Environment.Put(ident, arg)
+	}
+
+	if len(formals) == 2 && formals[0] == "&" {
+		f.Environment.Put(formals[1], ExpressionNode{QExpression, make([]Node, 0)})
+		formals = formals[:0]
 	}
 
 	if len(formals) == 0 {
