@@ -1,0 +1,1 @@
+def {fun} (fn {name exec} {def (head name) (fn (tail name) exec)})
