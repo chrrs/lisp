@@ -1,1 +1,4 @@
-def {fun} (fn {name exec} {def (head name) (fn (tail name) exec)})
+def {fun} (fn {n e} {def (head n) (fn (tail n) e)})
+
+fun {curry f xs} {eval (join (list f) xs)}
+fun {uncurry f & xs} {f xs}
