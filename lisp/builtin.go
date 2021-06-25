@@ -101,7 +101,7 @@ func Head(_ *Environment, args []Node) Node {
 		return ErrorNode{errors.New("cannot take head of empty list")}
 	}
 
-	return expr.Nodes[0]
+	return ExpressionNode{QExpression, expr.Nodes[:1]}
 }
 
 func Tail(_ *Environment, args []Node) Node {
