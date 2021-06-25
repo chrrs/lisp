@@ -1,4 +1,4 @@
-def {fun} (fn {n e} {def (head n) (fn (tail n) e)})
+(def {fun} (fn {n e} {def (head n) (fn (tail n) e)}))
 
-fun {curry f xs} {eval (join (list f) xs)}
-fun {uncurry f & xs} {f xs}
+(fun {curry f xs} {eval (join (list f) xs)})
+(fun {uncurry f & xs} {f xs})
