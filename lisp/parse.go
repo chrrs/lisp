@@ -73,14 +73,14 @@ func (i IdentifierNode) String() string {
 	return string(i)
 }
 
-type NumberNode int
+type NumberNode float64
 
 func (_ NumberNode) TypeString() string {
 	return "Number"
 }
 
 func (v NumberNode) String() string {
-	return strconv.Itoa(int(v))
+	return fmt.Sprintf("%g", v)
 }
 
 type ErrorNode struct {
@@ -184,7 +184,7 @@ func ParseExpression(input []Token, type_ ExpressionType) (ExpressionNode, error
 			ret.Nodes = append(ret.Nodes, IdentifierNode(input[0].Value))
 			input = input[1:]
 		case NumberToken:
-			value, _ := strconv.Atoi(input[0].Value)
+			value, _ := strconv.ParseFloat(input[0].Value, 64)
 			ret.Nodes = append(ret.Nodes, NumberNode(value))
 
 			input = input[1:]

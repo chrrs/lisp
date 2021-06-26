@@ -17,13 +17,13 @@ func (i IncorrectType) Error() string {
 }
 
 func Add(_ *Environment, args []Node) Node {
-	sum := 0
+	sum := 0.0
 	for _, node := range args {
 		n, ok := node.(NumberNode)
 		if !ok {
 			return ErrorNode{IncorrectType{"Number", node.TypeString()}}
 		}
-		sum += int(n)
+		sum += float64(n)
 	}
 	return NumberNode(sum)
 }
