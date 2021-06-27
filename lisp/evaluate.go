@@ -57,6 +57,7 @@ func (env *Environment) AddBuiltins() {
 	env.Def("def", FunctionNode{Builtin: Def})
 	env.Def("let", FunctionNode{Builtin: Let})
 	env.Def("fn", FunctionNode{Builtin: Fn})
+	env.Def("if", FunctionNode{Builtin: If})
 }
 
 func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {

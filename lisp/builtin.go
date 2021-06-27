@@ -291,3 +291,30 @@ func Equal(env *Environment, args []Node) Node {
 
 	return NumberNode(1)
 }
+
+func If(env *Environment, args []Node) Node {
+	if len(args) != 3 {
+		return ErrorNode{fmt.Errorf("expected 3 arguments, got %v", len(args))}
+	}
+
+	condition, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	yes, ok := args[1].(ExpressionNode)
+	if !ok || yes.Type != QExpression {
+		return ErrorNode{IncorrectType{"Q-Expression", args[1].TypeString()}}
+	}
+
+	no, ok := args[2].(ExpressionNode)
+	if !ok || no.Type != QExpression {
+		return ErrorNode{IncorrectType{"Q-Expression", args[2].TypeString()}}
+	}
+
+	if condition != NumberNode(0) {
+		return yes.EvalAsSExpr(env)
+	} else {
+		return no.EvalAsSExpr(env)
+	}
+}
