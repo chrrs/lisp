@@ -128,6 +128,9 @@ func (f FunctionNode) call(env *Environment, args []Node) Node {
 
 	formals := f.Formals
 
+	funEnv := NewEnvironment(env)
+	f.Environment = &funEnv
+
 	for i, arg := range args {
 		if len(formals) == 0 {
 			return ErrorNode{fmt.Errorf("expected %v arguments, got %v", len(f.Formals), len(args))}
@@ -157,7 +160,6 @@ func (f FunctionNode) call(env *Environment, args []Node) Node {
 	}
 
 	if len(formals) == 0 {
-		f.Environment.Parent = env
 		return f.Body.EvalAsSExpr(f.Environment)
 	}
 
