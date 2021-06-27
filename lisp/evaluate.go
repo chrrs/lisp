@@ -167,3 +167,34 @@ func (f FunctionNode) call(env *Environment, args []Node) Node {
 func (f FunctionNode) Evaluate(_ *Environment) Node {
 	return f
 }
+
+func Evaluate(env *Environment, input string, multi bool) (Node, error) {
+	tokens, err := Tokenize(input)
+	if err != nil {
+		return nil, fmt.Errorf("tokenization error: %v", err)
+	}
+
+	if multi {
+		expression, err := ParseExpression(tokens, QExpression)
+		if err != nil {
+			return nil, fmt.Errorf("parsing error: %v", err)
+		}
+
+		for _, node := range expression.Nodes {
+			out := node.Evaluate(env)
+			err, ok := out.(ErrorNode)
+			if ok {
+				return nil, err.Error
+			}
+		}
+
+		return ExpressionNode{Type: SExpression, Nodes: make([]Node, 0)}, nil
+	} else {
+		expression, err := ParseExpression(tokens, SExpression)
+		if err != nil {
+			return nil, fmt.Errorf("parsing error: %v", err)
+		}
+
+		return expression.Evaluate(env), nil
+	}
+}
