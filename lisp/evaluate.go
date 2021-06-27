@@ -46,6 +46,7 @@ func (env *Environment) AddBuiltins() {
 	env.Def("*", FunctionNode{Builtin: Mul})
 	env.Def("/", FunctionNode{Builtin: Div})
 
+	env.Def("import", FunctionNode{Builtin: Import})
 	env.Def("head", FunctionNode{Builtin: Head})
 	env.Def("tail", FunctionNode{Builtin: Tail})
 	env.Def("list", FunctionNode{Builtin: List})

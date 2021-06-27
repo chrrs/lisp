@@ -3,6 +3,7 @@ package lisp
 import (
 	"errors"
 	"fmt"
+	"os"
 )
 
 type Builtin func(*Environment, []Node) Node
@@ -217,4 +218,25 @@ func Fn(env *Environment, args []Node) Node {
 		Formals:     formals,
 		Body:        args[1].(ExpressionNode),
 	}
+}
+
+func Import(env *Environment, args []Node) Node {
+	if len(args) != 1 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	path, ok := args[0].(StringNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"String", args[0].TypeString()}}
+	}
+
+	file, err := os.ReadFile(string(path) + ".clsp")
+	if err == nil {
+		_, err := Evaluate(env, string(file), true)
+		if err != nil {
+			return ErrorNode{err}
+		}
+	}
+
+	return ExpressionNode{Type: SExpression}
 }
