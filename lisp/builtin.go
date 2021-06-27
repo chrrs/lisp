@@ -188,7 +188,7 @@ func Def(env *Environment, args []Node) Node {
 	return val(env, args, true)
 }
 
-func Fn(env *Environment, args []Node) Node {
+func Fn(_ *Environment, args []Node) Node {
 	if len(args) != 2 {
 		return ErrorNode{fmt.Errorf("expected 2 arguments, got %v", len(args))}
 	}
