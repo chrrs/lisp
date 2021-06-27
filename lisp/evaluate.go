@@ -46,6 +46,8 @@ func (env *Environment) AddBuiltins() {
 	env.Def("*", FunctionNode{Builtin: Mul})
 	env.Def("/", FunctionNode{Builtin: Div})
 
+	env.Def("=", FunctionNode{Builtin: Equal})
+
 	env.Def("import", FunctionNode{Builtin: Import})
 	env.Def("head", FunctionNode{Builtin: Head})
 	env.Def("tail", FunctionNode{Builtin: Tail})
@@ -64,12 +66,14 @@ func (e ExpressionNode) EvalAsSExpr(env *Environment) Node {
 
 	nodes := make([]Node, len(e.Nodes))
 	for i, node := range e.Nodes {
-		_, ok := node.(ErrorNode)
+		evaluated := node.Evaluate(env)
+
+		_, ok := evaluated.(ErrorNode)
 		if ok {
-			return node
+			return evaluated
 		}
 
-		nodes[i] = node.Evaluate(env)
+		nodes[i] = evaluated
 	}
 
 	if len(nodes) == 1 {

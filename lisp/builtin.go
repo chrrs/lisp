@@ -240,3 +240,54 @@ func Import(env *Environment, args []Node) Node {
 
 	return ExpressionNode{Type: SExpression}
 }
+
+func Equal(env *Environment, args []Node) Node {
+	if len(args) < 2 {
+		return ErrorNode{fmt.Errorf("expected 2 or more arguments, got %v", len(args))}
+	}
+
+	first := args[0]
+
+	for _, arg := range args[1:] {
+		switch first.(type) {
+		case NumberNode:
+			n, ok := arg.(NumberNode)
+			if !ok {
+				return NumberNode(0)
+			}
+
+			if first != n {
+				return NumberNode(0)
+			}
+		case StringNode:
+			str, ok := arg.(StringNode)
+			if !ok {
+				return NumberNode(0)
+			}
+
+			if first != str {
+				return NumberNode(0)
+			}
+		case ExpressionNode:
+			first := first.(ExpressionNode)
+			expr, ok := arg.(ExpressionNode)
+			if !ok {
+				return NumberNode(0)
+			}
+
+			if first.Type != expr.Type || len(first.Nodes) != len(expr.Nodes) {
+				return NumberNode(0)
+			}
+
+			for i, node := range first.Nodes {
+				if Equal(env, []Node{expr.Nodes[i], node}) == NumberNode(0) {
+					return NumberNode(0)
+				}
+			}
+		default:
+			return ErrorNode{fmt.Errorf("unimplemented equality for %v", first.TypeString())}
+		}
+	}
+
+	return NumberNode(1)
+}
