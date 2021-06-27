@@ -107,6 +107,10 @@ func (v NumberNode) Evaluate(_ *Environment) Node {
 	return v
 }
 
+func (s StringNode) Evaluate(_ *Environment) Node {
+	return s
+}
+
 func (e ErrorNode) Evaluate(_ *Environment) Node {
 	return e
 }

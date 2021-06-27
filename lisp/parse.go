@@ -83,6 +83,16 @@ func (v NumberNode) String() string {
 	return fmt.Sprintf("%g", v)
 }
 
+type StringNode string
+
+func (_ StringNode) TypeString() string {
+	return "String"
+}
+
+func (s StringNode) String() string {
+	return strconv.Quote(string(s))
+}
+
 type ErrorNode struct {
 	Error error
 }
@@ -187,6 +197,14 @@ func ParseExpression(input []Token, type_ ExpressionType) (ExpressionNode, error
 			value, _ := strconv.ParseFloat(input[0].Value, 64)
 			ret.Nodes = append(ret.Nodes, NumberNode(value))
 
+			input = input[1:]
+		case StringToken:
+			value, err := strconv.Unquote(input[0].Value)
+			if err != nil {
+				return ExpressionNode{}, fmt.Errorf("failed to parse string, %v", err)
+			}
+
+			ret.Nodes = append(ret.Nodes, StringNode(value))
 			input = input[1:]
 		case OpenToken:
 			var type_ ExpressionType
