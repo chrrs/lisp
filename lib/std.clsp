@@ -20,6 +20,14 @@
         {join (list (f (first xs))) (map f (tail xs))}
 })
 
+(fun {filter f xs} {
+    if (= xs nil)
+        {nil}
+        {if (f (first xs))
+            {join (head xs) (filter f (tail xs))}
+            {filter f (tail xs)}}
+})
+
 (fun {first xs} {eval (head xs)})
 (fun {second xs} {eval (head (tail xs))})
 
