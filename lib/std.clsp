@@ -1,4 +1,49 @@
 (def {fun} (fn {n e} {def (head n) (fn (tail n) e)}))
 
+(def {true} 1)
+(def {false} 0)
+(def {else} true)
+(def {nil} {})
+
 (fun {curry f xs} {eval (join (list f) xs)})
 (fun {uncurry f & xs} {f xs})
+
+(fun {range f t} {
+    if (= f t)
+        {list f}
+        {join (list f) (range (+ f 1) t)}
+})
+
+(fun {map f xs} {
+    if (= xs nil)
+        {nil}
+        {join (list (f (first xs))) (map f (tail xs))}
+})
+
+(fun {first xs} {eval (head xs)})
+(fun {second xs} {eval (head (tail xs))})
+
+(fun {len xs} {
+    if (= xs {})
+        {0}
+        {+ 1 (len (tail xs))}
+})
+
+(fun {select & xs} {
+    if (first (first xs))
+        {second (first xs)}
+        {curry select (tail xs)}
+})
+
+(fun {factorial n} {
+    if (= n 0)
+        {1}
+        {* n (factorial (- n 1))}
+})
+
+(fun {fibonacci n} {
+    select
+        {(= n 0) 0}
+        {(= n 1) 1}
+        {else (+ (fibonacci (- n 1)) (fibonacci (- n 2)))}
+})
