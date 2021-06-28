@@ -3,6 +3,7 @@ package lisp
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -316,5 +317,111 @@ func If(env *Environment, args []Node) Node {
 		return yes.EvalAsSExpr(env)
 	} else {
 		return no.EvalAsSExpr(env)
+	}
+}
+
+func Mod(_ *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	n, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	mod, ok := args[1].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[1].TypeString()}}
+	}
+
+	return NumberNode(math.Mod(float64(n), float64(mod)))
+}
+
+func Less(_ *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	n1, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	n2, ok := args[1].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[1].TypeString()}}
+	}
+
+	if n1 < n2 {
+		return NumberNode(1)
+	} else {
+		return NumberNode(0)
+	}
+}
+
+func LessEqual(_ *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	n1, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	n2, ok := args[1].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[1].TypeString()}}
+	}
+
+	if n1 <= n2 {
+		return NumberNode(1)
+	} else {
+		return NumberNode(0)
+	}
+}
+
+func More(_ *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	n1, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	n2, ok := args[1].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[1].TypeString()}}
+	}
+
+	if n1 > n2 {
+		return NumberNode(1)
+	} else {
+		return NumberNode(0)
+	}
+}
+
+func MoreEqual(_ *Environment, args []Node) Node {
+	if len(args) != 2 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	n1, ok := args[0].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[0].TypeString()}}
+	}
+
+	n2, ok := args[1].(NumberNode)
+	if !ok {
+		return ErrorNode{IncorrectType{"Number", args[1].TypeString()}}
+	}
+
+	if n1 >= n2 {
+		return NumberNode(1)
+	} else {
+		return NumberNode(0)
 	}
 }

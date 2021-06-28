@@ -47,6 +47,11 @@ func (env *Environment) AddBuiltins() {
 	env.Def("/", FunctionNode{Builtin: Div})
 
 	env.Def("=", FunctionNode{Builtin: Equal})
+	env.Def("<", FunctionNode{Builtin: Less})
+	env.Def("<=", FunctionNode{Builtin: LessEqual})
+	env.Def(">", FunctionNode{Builtin: More})
+	env.Def(">=", FunctionNode{Builtin: MoreEqual})
+	env.Def("%", FunctionNode{Builtin: Mod})
 
 	env.Def("import", FunctionNode{Builtin: Import})
 	env.Def("head", FunctionNode{Builtin: Head})
