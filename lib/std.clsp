@@ -5,6 +5,9 @@
 (def {else} true)
 (def {nil} {})
 
+(fun {even n} {= (% n 2) 0})
+(fun {odd n} {= (% n 2) 1})
+
 (fun {curry f xs} {eval (join (list f) xs)})
 (fun {uncurry f & xs} {f xs})
 
