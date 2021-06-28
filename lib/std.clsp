@@ -46,6 +46,12 @@
         {curry select (tail xs)}
 })
 
+(fun {switch n & xs} {
+    if (= (first (first xs)) n)
+        {second (first xs)}
+        {curry switch (join (list n) (tail xs))}
+})
+
 (fun {factorial n} {
     if (= n 0)
         {1}
