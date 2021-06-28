@@ -21,6 +21,8 @@ $ go run lisp
 
 This runs the REPL on your computer directly without compiling.
 
+> Note: You probably want to use the standard library, so you should import that using `import "lib/std"`
+
 ## Syntax
 
 Every call in clisp follows the `[func] [args...]` pattern. For example:
