@@ -7,6 +7,14 @@
 (def {nil} {})
 (def {else} true)
 
+(fun {not b} {if b {false} {true}})
+(fun {or & bs} {
+    select
+        {(= (len bs) 1) (first bs)}
+        {(first bs) true}
+        {else (curry or (tail bs))}
+})
+
 (fun {even n} {= (% n 2) 0})
 (fun {odd n} {= (% n 2) 1})
 
@@ -34,6 +42,9 @@
             {filter f (tail xs)}}
 })
 
+(fun {append l & xs} {join l xs})
+(fun {prepend l & xs} {join xs l})
+
 (fun {first xs} {eval (head xs)})
 (fun {second xs} {eval (head (tail xs))})
 (fun {last xs} {eval (post xs)})
@@ -51,12 +62,18 @@
 })
 
 (fun {len xs} {
-    if (= xs {})
+    if (= xs nil)
         {0}
         {+ 1 (len (tail xs))}
 })
 
 ; String functions
+(fun {strLen s} {
+    if (= s "")
+        {0}
+        {+ 1 (strLen (tail s))}
+})
+
 (fun {startsWith s c} {
     select
         {(= c "") true}
@@ -70,6 +87,27 @@
         {(= s "") false}
         {(startsWith s c) true}
         {else (contains (tail s) c)}
+})
+
+(fun {indexOf s c} {
+    select
+        {(= s "") -9999}
+        {(startsWith s c) 0}
+        {else (+ 1 (indexOf (tail s) c))}
+})
+
+(fun {tokenize s} {
+    if (= s "")
+        {{}}
+        {join (list (head s)) (tokenize (tail s))}
+})
+
+(fun {split s p} {
+    select
+        {(= s "") {}}
+        {(not (contains s p)) (list s)}
+        {(startsWith s p) (split (drop (strLen p) s) p)}
+        {else (prepend (split (drop (indexOf s p) s) p) (dropLast (- (strLen s) (indexOf s p)) s))}
 })
 
 ; Comparison conditional functions
