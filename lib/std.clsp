@@ -43,6 +43,22 @@
         {+ 1 (len (tail xs))}
 })
 
+; String functions
+(fun {startsWith s c} {
+    select
+        {(= c "") true}
+        {(= s "") false}
+        {(= (head s) (head c)) (startsWith (tail s) (tail c))}
+        {else false}
+})
+
+(fun {contains s c} {
+    select
+        {(= s "") false}
+        {(startsWith s c) true}
+        {else (contains (tail s) c)}
+})
+
 ; Comparison conditional functions
 (fun {select & xs} {
     if (first (first xs))
