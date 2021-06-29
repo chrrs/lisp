@@ -19,6 +19,8 @@ func (t TokenType) String() string {
 		return "Number"
 	case IdentifierToken:
 		return "Identifier"
+	case StringToken:
+		return "String"
 	default:
 		return "<unknown>"
 	}
