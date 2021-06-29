@@ -36,6 +36,19 @@
 
 (fun {first xs} {eval (head xs)})
 (fun {second xs} {eval (head (tail xs))})
+(fun {last xs} {eval (post xs)})
+
+(fun {drop n xs} {
+    if (= n 0)
+        {xs}
+        {drop (- n 1) (tail xs)}
+})
+
+(fun {dropLast n xs} {
+    if (= n 0)
+        {xs}
+        {dropLast (- n 1) (init xs)}
+})
 
 (fun {len xs} {
     if (= xs {})
