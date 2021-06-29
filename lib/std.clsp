@@ -1,9 +1,11 @@
+; The 'fun' function definition, arguably the most important one in the standard library
 (def {fun} (fn {n e} {def (head n) (fn (tail n) e)}))
 
+; Generally useful variable definitions
 (def {true} 1)
 (def {false} 0)
-(def {else} true)
 (def {nil} {})
+(def {else} true)
 
 (fun {even n} {= (% n 2) 0})
 (fun {odd n} {= (% n 2) 1})
@@ -11,6 +13,7 @@
 (fun {curry f xs} {eval (join (list f) xs)})
 (fun {uncurry f & xs} {f xs})
 
+; List generation / Alteration
 (fun {range f t} {
     if (= f t)
         {list f}
@@ -40,6 +43,7 @@
         {+ 1 (len (tail xs))}
 })
 
+; Comparison conditional functions
 (fun {select & xs} {
     if (first (first xs))
         {second (first xs)}
@@ -52,6 +56,7 @@
         {curry switch (join (list n) (tail xs))}
 })
 
+; Some fun math functions
 (fun {factorial n} {
     if (= n 0)
         {1}
