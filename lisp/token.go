@@ -42,6 +42,8 @@ var Patterns = map[TokenType]*regexp.Regexp{
 	IdentifierToken: regexp.MustCompile("^[a-zA-Z_+\\-*/\\\\=<>!&%][a-zA-Z0-9_+\\-*/\\\\=<>!&%]*"),
 }
 
+var CommentPattern = regexp.MustCompile("^;.*?(?:[\\n\\r]|$)")
+
 type Token struct {
 	Type  TokenType
 	Value string
@@ -63,6 +65,12 @@ func Tokenize(input string) ([]Token, error) {
 
 	for len(toParse) > 0 {
 		parsed := false
+
+		matches := CommentPattern.FindStringSubmatch(toParse)
+		if len(matches) > 0 {
+			toParse = toParse[len(matches[0]):]
+			break
+		}
 
 		for type_, pattern := range Patterns {
 			matches := pattern.FindStringSubmatch(toParse)
