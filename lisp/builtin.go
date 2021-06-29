@@ -222,7 +222,7 @@ func Join(_ *Environment, args []Node) Node {
 		for _, n := range args {
 			expr, ok := n.(ExpressionNode)
 			if !ok || expr.Type != QExpression {
-				return ErrorNode{IncorrectType{"Q-Expression or String", n.TypeString()}}
+				return ErrorNode{IncorrectType{"Q-Expression", n.TypeString()}}
 			}
 			nodes = append(nodes, expr.Nodes...)
 		}
@@ -234,7 +234,7 @@ func Join(_ *Environment, args []Node) Node {
 		for _, n := range args {
 			str, ok := n.(StringNode)
 			if !ok {
-				return ErrorNode{IncorrectType{"Q-Expression or String", n.TypeString()}}
+				return ErrorNode{IncorrectType{"String", n.TypeString()}}
 			}
 			ret += str
 		}
