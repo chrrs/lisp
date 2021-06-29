@@ -143,6 +143,7 @@ func trimWhitespace(input *[]Token) bool {
 
 	if (*input)[0].Type == WhitespaceToken {
 		*input = (*input)[1:]
+		trimWhitespace(input)
 		return true
 	} else {
 		return false

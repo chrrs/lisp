@@ -71,7 +71,7 @@ func Tokenize(input string) ([]Token, error) {
 		matches := CommentPattern.FindStringSubmatch(toParse)
 		if len(matches) > 0 {
 			toParse = toParse[len(matches[0]):]
-			break
+			continue
 		}
 
 		for type_, pattern := range Patterns {
