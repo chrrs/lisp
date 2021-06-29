@@ -107,7 +107,7 @@ func Head(_ *Environment, args []Node) Node {
 		return ExpressionNode{QExpression, v.Nodes[:1]}
 	case StringNode:
 		if len(v) == 0 {
-			return ErrorNode{errors.New("cannot take tail of empty string")}
+			return ErrorNode{errors.New("cannot take head of empty string")}
 		}
 
 		return v[:1]
@@ -138,6 +138,60 @@ func Tail(_ *Environment, args []Node) Node {
 		}
 
 		return v[1:]
+	default:
+		return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+	}
+}
+
+func Post(_ *Environment, args []Node) Node {
+	if len(args) > 1 {
+		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
+	}
+
+	switch v := args[0].(type) {
+	case ExpressionNode:
+		if v.Type != QExpression {
+			return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+		}
+
+		if len(v.Nodes) == 0 {
+			return ErrorNode{errors.New("cannot take post of empty list")}
+		}
+
+		return ExpressionNode{QExpression, v.Nodes[len(v.Nodes)-1:]}
+	case StringNode:
+		if len(v) == 0 {
+			return ErrorNode{errors.New("cannot take post of empty string")}
+		}
+
+		return v[len(v)-1:]
+	default:
+		return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+	}
+}
+
+func Init(_ *Environment, args []Node) Node {
+	if len(args) > 1 {
+		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
+	}
+
+	switch v := args[0].(type) {
+	case ExpressionNode:
+		if v.Type != QExpression {
+			return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+		}
+
+		if len(v.Nodes) == 0 {
+			return ErrorNode{errors.New("cannot take init of empty list")}
+		}
+
+		return ExpressionNode{QExpression, v.Nodes[:len(v.Nodes)-1]}
+	case StringNode:
+		if len(v) == 0 {
+			return ErrorNode{errors.New("cannot take init of empty string")}
+		}
+
+		return v[:len(v)-1]
 	default:
 		return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
 	}

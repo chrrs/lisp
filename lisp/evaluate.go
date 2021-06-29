@@ -56,6 +56,8 @@ func (env *Environment) AddBuiltins() {
 	env.Def("import", FunctionNode{Builtin: Import})
 	env.Def("head", FunctionNode{Builtin: Head})
 	env.Def("tail", FunctionNode{Builtin: Tail})
+	env.Def("post", FunctionNode{Builtin: Post})
+	env.Def("init", FunctionNode{Builtin: Init})
 	env.Def("list", FunctionNode{Builtin: List})
 	env.Def("eval", FunctionNode{Builtin: Eval})
 	env.Def("join", FunctionNode{Builtin: Join})
