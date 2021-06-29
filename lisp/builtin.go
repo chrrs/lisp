@@ -94,16 +94,26 @@ func Head(_ *Environment, args []Node) Node {
 		return ErrorNode{fmt.Errorf("expected 1 argument, got %v", len(args))}
 	}
 
-	expr, ok := args[0].(ExpressionNode)
-	if !ok || expr.Type != QExpression {
-		return ErrorNode{IncorrectType{"Q-Expression", args[0].TypeString()}}
-	}
+	switch v := args[0].(type) {
+	case ExpressionNode:
+		if v.Type != QExpression {
+			return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+		}
 
-	if len(expr.Nodes) == 0 {
-		return ErrorNode{errors.New("cannot take head of empty list")}
-	}
+		if len(v.Nodes) == 0 {
+			return ErrorNode{errors.New("cannot take head of empty list")}
+		}
 
-	return ExpressionNode{QExpression, expr.Nodes[:1]}
+		return ExpressionNode{QExpression, v.Nodes[:1]}
+	case StringNode:
+		if len(v) == 0 {
+			return ErrorNode{errors.New("cannot take tail of empty string")}
+		}
+
+		return v[:1]
+	default:
+		return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+	}
 }
 
 func Tail(_ *Environment, args []Node) Node {
@@ -111,16 +121,26 @@ func Tail(_ *Environment, args []Node) Node {
 		return ErrorNode{errors.New(fmt.Sprintf("expected 1 argument, got %v", len(args)))}
 	}
 
-	expr, ok := args[0].(ExpressionNode)
-	if !ok || expr.Type != QExpression {
-		return ErrorNode{IncorrectType{"Q-Expression", args[0].TypeString()}}
-	}
+	switch v := args[0].(type) {
+	case ExpressionNode:
+		if v.Type != QExpression {
+			return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+		}
 
-	if len(expr.Nodes) == 0 {
-		return ErrorNode{errors.New("cannot take tail of empty list")}
-	}
+		if len(v.Nodes) == 0 {
+			return ErrorNode{errors.New("cannot take tail of empty list")}
+		}
 
-	return ExpressionNode{QExpression, expr.Nodes[1:]}
+		return ExpressionNode{QExpression, v.Nodes[1:]}
+	case StringNode:
+		if len(v) == 0 {
+			return ErrorNode{errors.New("cannot take tail of empty string")}
+		}
+
+		return v[1:]
+	default:
+		return ErrorNode{IncorrectType{"Q-Expression or String", args[0].TypeString()}}
+	}
 }
 
 func List(_ *Environment, args []Node) Node {
@@ -141,15 +161,34 @@ func Eval(env *Environment, args []Node) Node {
 }
 
 func Join(_ *Environment, args []Node) Node {
-	nodes := make([]Node, 0)
-	for _, n := range args {
-		expr, ok := n.(ExpressionNode)
-		if !ok || expr.Type != QExpression {
-			return ErrorNode{IncorrectType{"Q-Expression", n.TypeString()}}
+	switch v := args[0].(type) {
+	case ExpressionNode:
+		nodes := make([]Node, 0)
+
+		for _, n := range args {
+			expr, ok := n.(ExpressionNode)
+			if !ok || expr.Type != QExpression {
+				return ErrorNode{IncorrectType{"Q-Expression or String", n.TypeString()}}
+			}
+			nodes = append(nodes, expr.Nodes...)
 		}
-		nodes = append(nodes, expr.Nodes...)
+
+		return ExpressionNode{QExpression, nodes}
+	case StringNode:
+		ret := StringNode("")
+
+		for _, n := range args {
+			str, ok := n.(StringNode)
+			if !ok {
+				return ErrorNode{IncorrectType{"Q-Expression or String", n.TypeString()}}
+			}
+			ret += str
+		}
+
+		return ret
+	default:
+		return ErrorNode{IncorrectType{"Q-Expression or String", v.TypeString()}}
 	}
-	return ExpressionNode{QExpression, nodes}
 }
 
 func val(env *Environment, args []Node, global bool) Node {
